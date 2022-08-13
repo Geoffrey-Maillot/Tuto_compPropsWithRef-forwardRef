@@ -1,46 +1,129 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Tuto : ComponentPropsWithRef / forwardRef
 
-## Available Scripts
+- Forward Ref va permettre de déclarer une ref dans un composant et de passer cette ref a un composant enfant 
+- Etendre l'interface d'un composant avec "componantPropsWithRef<>" va permettre de faire de passer des props natif à un element html  
+  sans avoir à les déclarer dans les props et dans l'interface du composant qui les reçoit `
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```javascript
+/**
+* Composant  
+*/
+import { useState, forwardRef } from 'react';
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+export enum InputSize {
+  SMALL = 'small',
+  NORMAL = 'Normal',
+  LARGE = 'LARGE',
+}
 
-### `npm test`
+interface Props extends React.ComponentPropsWithoutRef<'input'> {
+  error?: boolean;
+  className?: string;
+  inputSize?: InputSize;
+  onChangeValue?: React.Dispatch<React.SetStateAction<string>>;
+}
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+const Input = forwardRef<HTMLInputElement, Props>(
+  (
+    { error, className: additionnalClassName, onChangeValue, ...props },
+    ref
+  ) => {
+    const [val, setVal] = useState('');
 
-### `npm run build`
+    const handlerOnChange = (e: React.ChangeEvent) => {
+      const { value } = e.target as HTMLInputElement;
+      setVal(value);
+      onChangeValue && onChangeValue(value);
+    };
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    const disableClass = props.disabled ? 'border-gray-200' : '';
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    return (
+      <input
+        {...props}
+        ref={ref}
+        className={` border border-2 border-blue-600 pl-4 py-1 rounded ${additionnalClassName} ${disableClass}`}
+        onChange={handlerOnChange}
+        disabled={props.disabled}
+      />
+    );
+  }
+);
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export default Input;
 
-### `npm run eject`
+````
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+ ```javascript
+  <Input
+    ref={inputRef} // 1° Je peu passé une ref au composant et récupérer l'élément ici depuis le parent 🔥
+    type="text" //2° "type" est un attribut natif d'un l'element <input>, je peu le passer en props sans avoir à le définir dans le composant 🔥🔥
+    name="Nom" //2° "name" : Idem
+    value={val} //2° "value" : Idem
+    required // 2° required : Idem
+    inputSize={InputSize.NORMAL} // 3° InputSize est une props perso, je la définis dans les props du composant <Input />
+    onChangeValue={setVal} // 3° : idem
+    className="ml-4" // 3° : Idem, "className n'est pas une props native d'un élément html, elle est apporté par React. Je dois donc la définir dans les props. Il faut aussi la renomer dans le composant vu que l'attribut className existe déjà. (On peu aussi le nommer différemment ici) "
+            />
+  ``` 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 📖 Lesson learned
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- notion
 
-## Learn More
+## 🛠 Stack
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- React / typescript
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+## Run Locally
+
+
+Clone project
+```bash
+git clone git@github.com:monProjet
+```
+
+Go to folder directory
+```bash
+cd monProjet
+```
+
+
+Install dependencies
+```bash
+# yarn
+yarn
+
+# npm
+npm install
+```
+
+Start server
+```bash
+# yarn
+yarn start
+
+# npm
+npm start
+
+# Projet run on http://localhost:3000/
+```
+
+
+
+
+## prerequisites
+
+- Node.js
+
+## 🔗 Links
+
+[![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://maillot-geoffrey-portfolio.xyz/)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/geoffrey-maillot-06a1411bb/)
+[![linkedin](https://img.shields.io/badge/github-24292F?style=for-the-badge&logo=github&logocolor=white)](https://github.com/Geoffrey-Maillot/)
